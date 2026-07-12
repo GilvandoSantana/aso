@@ -228,7 +228,7 @@
           <div class="field-row">
             <div class="field full">
               <label for="nome">Nome completo</label>
-              <input type="text" id="nome" placeholder="Nome do funcionário" required>
+              <input type="text" id="nome" placeholder="Nome completo do funcionário" required>
             </div>
           </div>
           <div class="field-row three">
@@ -437,7 +437,7 @@
       <div class="pin-error" id="pinErrorQuery">Código incorreto. Tente novamente.</div>
       <input type="password" id="pinInputQuery" placeholder="Código" maxlength="6">
       <div><button type="button" class="primary" onclick="checkPin('query')">Entrar</button></div>
-      <p style="margin-top:16px; font-size:11px;">Modelo fictício — código de demonstração: <b>1234</b></p>
+      <p style="margin-top:16px; font-size:11px;">Modelo teste — código de demonstração: <b>1234</b></p>
     </div>
 
     <div id="queryContent" style="display:none;">
@@ -456,10 +456,6 @@
             <div class="field">
               <label for="filtroCpf">CPF / matrícula</label>
               <input type="text" id="filtroCpf" placeholder="Buscar..." oninput="applyFilters()">
-            </div>
-            <div class="field">
-              <label for="filtroEmpresa">Empresa cliente</label>
-              <input type="text" id="filtroEmpresa" placeholder="Buscar..." oninput="applyFilters()">
             </div>
             <div class="field">
               <label for="filtroTipo">Tipo de exame</label>
@@ -502,17 +498,6 @@
         </div>
       </section>
 
-      <div class="retention-box">
-        <h4>Política de retenção</h4>
-        <p>Remove permanentemente exames mais antigos que o prazo definido (exclusão real do banco, não recuperável).</p>
-        <div class="retention-row">
-          <span class="body-font" style="font-size:12.5px;">Manter registros dos últimos</span>
-          <input type="number" id="retencaoAnos" value="5" min="1" max="20">
-          <span class="body-font" style="font-size:12.5px;">anos</span>
-          <button type="button" class="danger" onclick="applyRetention()">Aplicar política agora</button>
-        </div>
-      </div>
-
       <div class="audit-box">
         <h4>Log de acessos e ações</h4>
         <p>Registro de quando a consulta foi acessada e de anulações de exames, para fins de auditoria.</p>
@@ -539,7 +524,7 @@
       <div class="pin-error" id="pinErrorDash">Código incorreto. Tente novamente.</div>
       <input type="password" id="pinInputDash" placeholder="Código" maxlength="6">
       <div><button type="button" class="primary" onclick="checkPin('dash')">Entrar</button></div>
-      <p style="margin-top:16px; font-size:11px;">Modelo fictício — código de demonstração: <b>1234</b></p>
+      <p style="margin-top:16px; font-size:11px;">Modelo teste — código de demonstração: <b>1234</b></p>
     </div>
 
     <div id="dashContent" style="display:none;">
@@ -552,11 +537,6 @@
       <section class="section">
         <div class="section-head"><span class="section-num">▤</span><span class="section-title">Exames por tipo</span></div>
         <div class="section-body body-font" id="dashPorTipo"></div>
-      </section>
-
-      <section class="section">
-        <div class="section-head"><span class="section-num">▤</span><span class="section-title">Exames por empresa cliente</span></div>
-        <div class="section-body body-font" id="dashPorEmpresa"></div>
       </section>
     </div>
   </div>
