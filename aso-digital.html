@@ -197,7 +197,7 @@
 <div class="sheet">
 
   <header class="masthead">
-    <p class="eyebrow">Modelo fictício · Uso interno do consultório</p>
+    <p class="eyebrow">Modelo teste para Uflain</p>
     <h1 class="doc-title">Questionário de Saúde Ocupacional (ASO)</h1>
     <p class="doc-sub">Preenchimento digital, banco de exames e painel de acompanhamento</p>
     <div class="tabs">
@@ -229,12 +229,6 @@
             <div class="field full">
               <label for="nome">Nome completo</label>
               <input type="text" id="nome" placeholder="Nome do funcionário" required>
-            </div>
-          </div>
-          <div class="field-row">
-            <div class="field full">
-              <label for="empresaCliente">Empresa cliente</label>
-              <input type="text" id="empresaCliente" placeholder="Empresa para a qual o exame é feito">
             </div>
           </div>
           <div class="field-row three">
@@ -415,23 +409,8 @@
             <div class="stamp-seal">✓</div>
             <div class="stamp-text"><b>Identidade confirmada</b><span id="stampTime">—</span></div>
           </div>
-
-          <div class="field full" style="margin-top:18px;">
-            <label for="anexoPdf">Anexar ASO oficial assinado pelo médico (PDF, opcional)</label>
-            <input type="file" id="anexoPdf" accept="application/pdf" onchange="onAnexoChange()">
-            <span class="field-hint" id="anexoHint"></span>
-          </div>
         </div>
       </section>
-
-      <div class="disclaimer">
-        <strong>Nota sobre este modelo:</strong> este é um documento fictício, criado apenas como demonstração
-        de layout e fluxo. Antes de usar em produção, o consultório deve validar com um responsável jurídico
-        se a captura fotográfica/assinatura atende às exigências legais de identificação para o ASO
-        (incluindo LGPD, no que diz respeito a dados biométricos, de imagem e de saúde), o acesso à consulta
-        e o prazo de retenção dos registros.
-      </div>
-
       <footer class="actions">
         <button type="button" onclick="clearForm()">Limpar</button>
         <button type="submit" class="primary" id="btnSubmit">Concluir e salvar</button>
