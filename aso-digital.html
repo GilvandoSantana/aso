@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Questionário de Saúde Ocupacional — Modelo Digital</title>
+<style>
+  :root{
+    --petrol-900:#0f2b2e; --petrol-700:#163d40; --petrol-500:#1f5a5e;
+    --paper:#f6f3ec; --paper-2:#efe9dc; --ink:#1b2320; --ink-soft:#4c5651;
+    --amber:#c98a3e; --amber-soft:#e9d3ae; --line:#d8d0bd;
+    --ok:#3d6b4f; --err:#a4443a; --warn:#a4763a;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{ background:var(--paper); color:var(--ink); font-family:"Iowan Old Style","Georgia",serif; -webkit-font-smoothing:antialiased; }
+  .body-font{font-family:"Helvetica Neue",Arial,sans-serif;}
+  .sheet{ max-width:900px; margin:0 auto; padding:0 0 80px; }
+
+  header.masthead{ background:var(--petrol-900); color:var(--paper); padding:32px 28px 0; position:relative; overflow:hidden; }
+  header.masthead::after{ content:""; position:absolute; right:-40px; top:-40px; width:180px; height:180px; border:1.5px solid rgba(246,243,236,0.14); border-radius:50%; }
+  header.masthead::before{ content:""; position:absolute; right:10px; top:60px; width:120px; height:120px; border:1.5px solid rgba(246,243,236,0.10); border-radius:50%; }
+  .eyebrow{ font-family:"Helvetica Neue",Arial,sans-serif; text-transform:uppercase; letter-spacing:0.14em; font-size:11.5px; color:var(--amber-soft); margin:0 0 10px; position:relative; z-index:1; }
+  h1.doc-title{ font-size:25px; line-height:1.15; margin:0 0 6px; font-weight:600; max-width:520px; position:relative; z-index:1; }
+  .doc-sub{ font-family:"Helvetica Neue",Arial,sans-serif; font-size:13px; color:#c8d6d4; margin:0 0 20px; position:relative; z-index:1; }
+
+  .tabs{ display:flex; gap:4px; position:relative; z-index:1; flex-wrap:wrap; }
+  .tab-btn{ font-family:"Helvetica Neue",Arial,sans-serif; font-size:12.5px; font-weight:600; padding:11px 16px; background:rgba(246,243,236,0.06); color:#a9beba; border:none; border-bottom:2px solid transparent; cursor:pointer; border-radius:4px 4px 0 0; }
+  .tab-btn.active{ background:var(--paper); color:var(--petrol-900); }
+
+  .view{ display:none; } .view.active{ display:block; }
+
+  .stepper{ display:flex; gap:6px; padding:14px 20px 0; font-family:"Helvetica Neue",Arial,sans-serif; }
+  .step-item{ flex:1; display:flex; align-items:center; gap:8px; font-size:11.5px; color:var(--ink-soft); }
+  .step-dot{ width:22px; height:22px; border-radius:50%; border:1.5px solid var(--line); background:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--ink-soft); flex:none; transition:all .2s ease; }
+  .step-item.active .step-dot{ background:var(--petrol-900); border-color:var(--petrol-900); color:#fff; }
+  .step-item.active{ color:var(--petrol-900); font-weight:700; }
+  .step-line{ flex:1; height:1.5px; background:var(--line); }
+  @media (max-width:560px){ .step-item span.step-label{ display:none; } }
+
+  .section{ background:#fff; margin:22px 20px 0; border:1px solid var(--line); border-radius:3px; box-shadow:0 1px 0 rgba(15,43,46,0.03); }
+  .section-head{ display:flex; align-items:baseline; gap:12px; padding:18px 24px 14px; border-bottom:1px solid var(--line); }
+  .section-num{ font-family:"Helvetica Neue",Arial,sans-serif; font-size:11px; color:#fff; background:var(--petrol-500); width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex:none; font-weight:600; }
+  .section-title{ font-family:"Helvetica Neue",Arial,sans-serif; font-size:15px; font-weight:700; letter-spacing:0.01em; color:var(--petrol-900); }
+  .section-body{ padding:20px 24px 24px; }
+
+  .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+  .field-row.three{ grid-template-columns:1fr 1fr 1fr; }
+  .field{ display:flex; flex-direction:column; gap:6px; }
+  .field.full{ grid-column:1 / -1; }
+  label{ font-family:"Helvetica Neue",Arial,sans-serif; font-size:12px; color:var(--ink-soft); font-weight:600; }
+  input[type="text"], input[type="date"], input[type="number"], input[type="password"], input[type="file"], select, textarea{
+    font-family:"Helvetica Neue",Arial,sans-serif; font-size:14.5px; padding:10px 12px; border:1px solid var(--line);
+    border-radius:3px; background:var(--paper); color:var(--ink); width:100%;
+  }
+  input:focus, select:focus, textarea:focus{ outline:2px solid var(--amber); outline-offset:1px; background:#fff; }
+  textarea{ resize:vertical; min-height:64px; font-family:inherit; }
+  .field-hint{ font-family:"Helvetica Neue",Arial,sans-serif; font-size:11px; margin-top:2px; }
+  .field-hint.err{ color:var(--err); } .field-hint.ok{ color:var(--ok); }
+
+  .question{ padding:14px 0; border-bottom:1px dashed var(--line); }
+  .question:last-child{ border-bottom:none; }
+  .q-text{ font-size:14.5px; line-height:1.5; margin:0 0 10px; max-width:520px; }
+  .q-answers{ display:flex; gap:10px; font-family:"Helvetica Neue",Arial,sans-serif; }
+  .pill{ position:relative; }
+  .pill input{ position:absolute; opacity:0; inset:0; cursor:pointer; }
+  .pill span{ display:inline-block; padding:7px 18px; border:1px solid var(--line); border-radius:20px; font-size:13px; color:var(--ink-soft); cursor:pointer; transition:all .15s ease; }
+  .pill input:checked + span{ background:var(--petrol-900); border-color:var(--petrol-900); color:#fff; }
+  .q-detail{ margin-top:10px; display:none; } .q-detail.show{ display:block; }
+
+  .declaration{ font-family:"Helvetica Neue",Arial,sans-serif; font-size:13.5px; line-height:1.65; color:var(--ink-soft); background:var(--paper-2); border:1px solid var(--line); border-radius:3px; padding:16px 18px; }
+  .checkline{ display:flex; gap:10px; align-items:flex-start; margin-top:14px; font-family:"Helvetica Neue",Arial,sans-serif; font-size:13.5px; }
+  .checkline input{ margin-top:3px; flex:none; width:auto; }
+
+  .id-box{ display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap; }
+  .cam-frame{ width:200px; height:200px; border:2px solid var(--petrol-900); border-radius:6px; background:#0d1f20; position:relative; overflow:hidden; flex:none; }
+  .cam-frame.pad{ background:#fff; }
+  .cam-frame video, .cam-frame canvas, .cam-frame img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .cam-frame .placeholder{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#7fa39f; font-family:"Helvetica Neue",Arial,sans-serif; font-size:12px; text-align:center; padding:16px; }
+  .cam-frame .corner{ position:absolute; width:16px; height:16px; border-color:var(--amber); z-index:2; }
+  .corner.tl{ top:6px; left:6px; border-top:2px solid; border-left:2px solid; }
+  .corner.tr{ top:6px; right:6px; border-top:2px solid; border-right:2px solid; }
+  .corner.bl{ bottom:6px; left:6px; border-bottom:2px solid; border-left:2px solid; }
+  .corner.br{ bottom:6px; right:6px; border-bottom:2px solid; border-right:2px solid; }
+
+  .id-controls{ flex:1; min-width:220px; display:flex; flex-direction:column; gap:10px; }
+  .id-status{ font-family:"Helvetica Neue",Arial,sans-serif; font-size:12.5px; color:var(--ink-soft); }
+  button{ font-family:"Helvetica Neue",Arial,sans-serif; font-size:13.5px; font-weight:600; padding:10px 18px; border-radius:3px; border:1px solid var(--petrol-900); background:#fff; color:var(--petrol-900); cursor:pointer; transition:all .15s ease; }
+  button.primary{ background:var(--petrol-900); color:#fff; } button.primary:hover{ background:var(--petrol-700); }
+  button.danger{ border-color:var(--err); color:var(--err); } button.danger:hover{ background:#fbeceb; }
+  button:hover{ background:var(--paper-2); } button:disabled{ opacity:.45; cursor:not-allowed; }
+  .btn-row{ display:flex; gap:10px; flex-wrap:wrap; }
+
+  .stamp{ display:none; align-items:center; gap:10px; margin-top:6px; font-family:"Helvetica Neue",Arial,sans-serif; }
+  .stamp.show{ display:flex; }
+  .stamp-seal{ width:38px; height:38px; border:2px solid var(--ok); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--ok); font-size:18px; flex:none; }
+  .stamp-text b{ display:block; color:var(--ok); font-size:13px; } .stamp-text span{ font-size:11.5px; color:var(--ink-soft); }
+
+  footer.actions{ margin:26px 20px 0; display:flex; justify-content:flex-end; gap:12px; }
+  footer.actions button{ padding:13px 26px; font-size:14px; }
+  .disclaimer{ margin:28px 20px 0; padding:14px 18px; border-left:3px solid var(--amber); background:var(--paper-2); font-family:"Helvetica Neue",Arial,sans-serif; font-size:12px; color:var(--ink-soft); line-height:1.6; }
+
+  .confirmed-panel{ display:none; margin:22px 20px 0; background:var(--petrol-900); color:var(--paper); border-radius:3px; padding:26px 28px; font-family:"Helvetica Neue",Arial,sans-serif; }
+  .confirmed-panel.show{ display:block; }
+  .confirmed-panel h3{ margin:0 0 6px; font-size:17px; color:#fff; }
+  .confirmed-panel p{ margin:0; font-size:13px; color:#bcd0cd; }
+  .confirmed-panel .row{ display:flex; justify-content:space-between; margin-top:16px; padding-top:14px; border-top:1px solid rgba(246,243,236,0.15); font-size:12.5px; }
+
+  .pin-gate{ margin:22px 20px 0; background:#fff; border:1px solid var(--line); border-radius:3px; padding:40px 30px; text-align:center; font-family:"Helvetica Neue",Arial,sans-serif; }
+  .pin-gate .lock{ font-size:26px; margin-bottom:10px; }
+  .pin-gate h4{ margin:0 0 6px; color:var(--petrol-900); font-size:16px; }
+  .pin-gate p{ font-size:12.5px; color:var(--ink-soft); margin:0 0 18px; }
+  .pin-gate input{ max-width:160px; margin:0 auto 14px; text-align:center; letter-spacing:0.3em; }
+  .pin-error{ font-size:12px; color:var(--err); margin-bottom:10px; display:none; } .pin-error.show{ display:block; }
+
+  .query-bar{ display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; }
+  .query-bar .field{ min-width:140px; }
+  .query-note{ font-family:"Helvetica Neue",Arial,sans-serif; font-size:12px; color:var(--ink-soft); background:var(--paper-2); border:1px solid var(--line); border-radius:3px; padding:10px 14px; margin-top:14px; }
+  .toolbar-row{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:16px; }
+  .check-inline{ display:flex; align-items:center; gap:6px; font-family:"Helvetica Neue",Arial,sans-serif; font-size:12.5px; color:var(--ink-soft); }
+  .check-inline input{ width:auto; }
+
+  .volume-warning{ margin-top:14px; padding:10px 14px; background:#f6dedb; border:1px solid #e3b7b0; border-radius:3px; font-family:"Helvetica Neue",Arial,sans-serif; font-size:12px; color:var(--err); display:none; }
+  .volume-warning.show{ display:block; }
+
+  table.results{ width:100%; border-collapse:collapse; font-family:"Helvetica Neue",Arial,sans-serif; font-size:13px; margin-top:14px; }
+  table.results th{ text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-soft); border-bottom:1px solid var(--line); padding:8px 10px; }
+  table.results td{ padding:10px; border-bottom:1px solid var(--paper-2); vertical-align:middle; }
+  table.results tr:hover td{ background:var(--paper-2); }
+  table.results tr.anulado td{ opacity:0.5; }
+  .thumb{ width:34px; height:34px; border-radius:50%; object-fit:cover; border:1px solid var(--line); display:block; }
+  .link-btn{ border:none; background:none; color:var(--petrol-700); font-weight:700; text-decoration:underline; cursor:pointer; padding:0; }
+  .empty-state{ font-family:"Helvetica Neue",Arial,sans-serif; font-size:13px; color:var(--ink-soft); text-align:center; padding:30px 10px; }
+  .count-badge{ font-family:"Helvetica Neue",Arial,sans-serif; font-size:12px; color:var(--ink-soft); }
+  .badge{ font-family:"Helvetica Neue",Arial,sans-serif; font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:20px; display:inline-block; }
+  .badge.ok{ background:#e2ede4; color:var(--ok); } .badge.warn{ background:#f3e6d3; color:var(--warn); } .badge.err{ background:#f6dedb; color:var(--err); }
+  .pagination{ display:flex; align-items:center; justify-content:center; gap:14px; margin-top:16px; font-family:"Helvetica Neue",Arial,sans-serif; font-size:12.5px; }
+
+  .retention-box{ margin:22px 20px 0; background:#fff; border:1px solid var(--line); border-radius:3px; padding:18px 22px; font-family:"Helvetica Neue",Arial,sans-serif; }
+  .retention-box h4{ margin:0 0 4px; font-size:13.5px; color:var(--petrol-900); }
+  .retention-box p{ margin:0 0 12px; font-size:12px; color:var(--ink-soft); }
+  .retention-row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .retention-row input{ width:80px; }
+
+  .audit-box{ margin:22px 20px 0; background:#fff; border:1px solid var(--line); border-radius:3px; padding:18px 22px; font-family:"Helvetica Neue",Arial,sans-serif; }
+  .audit-box h4{ margin:0 0 4px; font-size:13.5px; color:var(--petrol-900); }
+  .audit-box p{ margin:0 0 10px; font-size:12px; color:var(--ink-soft); }
+  .audit-list{ list-style:none; margin:10px 0 0; padding:0; font-size:12px; color:var(--ink-soft); max-height:220px; overflow-y:auto; }
+  .audit-list li{ padding:7px 0; border-bottom:1px dashed var(--line); display:flex; justify-content:space-between; gap:10px; }
+
+  /* Dashboard */
+  .cards-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:22px 20px 0; }
+  .stat-card{ background:#fff; border:1px solid var(--line); border-radius:3px; padding:18px 20px; font-family:"Helvetica Neue",Arial,sans-serif; }
+  .stat-card .num{ font-size:26px; font-weight:700; color:var(--petrol-900); }
+  .stat-card .lbl{ font-size:11.5px; color:var(--ink-soft); margin-top:4px; }
+  .stat-card.warncard .num{ color:var(--err); }
+  @media (max-width:640px){ .cards-row{ grid-template-columns:1fr; } }
+
+  .bar-row{ display:flex; align-items:center; gap:10px; margin-bottom:10px; font-family:"Helvetica Neue",Arial,sans-serif; font-size:12.5px; }
+  .bar-label{ width:150px; flex:none; color:var(--ink-soft); }
+  .bar-track{ flex:1; background:var(--paper-2); border-radius:3px; height:14px; overflow:hidden; }
+  .bar-fill{ background:var(--petrol-500); height:100%; }
+  .bar-count{ width:30px; flex:none; text-align:right; font-weight:700; color:var(--petrol-900); }
+
+  /* Modal */
+  .modal-overlay{ display:none; position:fixed; inset:0; background:rgba(15,43,46,0.55); z-index:50; align-items:flex-start; justify-content:center; padding:40px 16px; overflow:auto; }
+  .modal-overlay.show{ display:flex; }
+  .modal{ background:#fff; border-radius:4px; max-width:500px; width:100%; padding:0 0 20px; font-family:"Helvetica Neue",Arial,sans-serif; }
+  .modal-head{ background:var(--petrol-900); color:#fff; padding:18px 22px; border-radius:4px 4px 0 0; display:flex; justify-content:space-between; align-items:center; }
+  .modal-head h4{ margin:0; font-size:15px; }
+  .modal-head button{ background:none; border:none; color:#cfe0dd; font-size:18px; cursor:pointer; padding:0; }
+  .modal-body{ padding:20px 22px; }
+  .modal-photo{ width:90px; height:90px; border-radius:50%; object-fit:cover; border:1px solid var(--line); display:block; margin-bottom:14px; }
+  .modal-row{ display:flex; justify-content:space-between; font-size:12.5px; padding:7px 0; border-bottom:1px dashed var(--line); }
+  .modal-row b{ color:var(--ink-soft); font-weight:600; }
+  .modal-answers{ margin-top:12px; } .modal-answers p{ font-size:12.5px; margin:0 0 8px; line-height:1.5; }
+  .modal-actions{ margin-top:16px; display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap; }
+  .modal-attach{ margin-top:10px; font-size:12.5px; }
+  .modal-history{ margin-top:12px; font-size:11.5px; color:var(--ink-soft); }
+  .modal-history li{ margin-bottom:4px; }
+
+  .loading{ font-family:"Helvetica Neue",Arial,sans-serif; font-size:12.5px; color:var(--ink-soft); padding:14px 0; }
+  #printArea{ display:none; }
+  @media print{ body *{ visibility:hidden; } #printArea, #printArea *{ visibility:visible; } #printArea{ display:block; position:absolute; top:0; left:0; width:100%; padding:20px; } }
+
+  @media (max-width:560px){
+    .field-row, .field-row.three{ grid-template-columns:1fr; }
+    .id-box{ flex-direction:column; align-items:center; }
+    .cam-frame{ width:100%; max-width:260px; height:260px; }
+    h1.doc-title{ font-size:20px; }
+    table.results{ font-size:12px; }
+    table.results th:nth-child(3), table.results td:nth-child(3){ display:none; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header class="masthead">
+    <p class="eyebrow">Modelo fictício · Uso interno do consultório</p>
+    <h1 class="doc-title">Questionário de Saúde Ocupacional (ASO)</h1>
+    <p class="doc-sub">Preenchimento digital, banco de exames e painel de acompanhamento</p>
+    <div class="tabs">
+      <button class="tab-btn active" id="tabBtnForm" onclick="switchTab('form')">Novo questionário</button>
+      <button class="tab-btn" id="tabBtnQuery" onclick="switchTab('query')">Consultar exames</button>
+      <button class="tab-btn" id="tabBtnDash" onclick="switchTab('dash')">Painel</button>
+    </div>
+  </header>
+
+  <!-- ===================== VIEW: FORM ===================== -->
+  <div class="view active" id="viewForm">
+
+    <div class="stepper" id="stepper">
+      <div class="step-item active" data-step="1"><div class="step-dot">1</div><span class="step-label">Dados</span></div>
+      <div class="step-line"></div>
+      <div class="step-item" data-step="2"><div class="step-dot">2</div><span class="step-label">Saúde</span></div>
+      <div class="step-line"></div>
+      <div class="step-item" data-step="3"><div class="step-dot">3</div><span class="step-label">Declaração</span></div>
+      <div class="step-line"></div>
+      <div class="step-item" data-step="4"><div class="step-dot">4</div><span class="step-label">Identidade</span></div>
+    </div>
+
+    <form id="asoForm">
+
+      <section class="section" id="section1">
+        <div class="section-head"><span class="section-num">1</span><span class="section-title">Dados do funcionário</span></div>
+        <div class="section-body body-font">
+          <div class="field-row">
+            <div class="field full">
+              <label for="nome">Nome completo</label>
+              <input type="text" id="nome" placeholder="Nome do funcionário" required>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field full">
+              <label for="empresaCliente">Empresa cliente</label>
+              <input type="text" id="empresaCliente" placeholder="Empresa para a qual o exame é feito">
+            </div>
+          </div>
+          <div class="field-row three">
+            <div class="field">
+              <label for="cpf">CPF ou matrícula</label>
+              <input type="text" id="cpf" placeholder="Ex.: 000.000.000-00" oninput="onCpfInput()">
+              <span class="field-hint" id="cpfHint"></span>
+            </div>
+            <div class="field">
+              <label for="cargo">Cargo / função</label>
+              <select id="cargo" onchange="toggleOutro('cargo')">
+                <option value="">Selecione...</option>
+                <option>Auxiliar de produção</option>
+                <option>Operador de máquinas</option>
+                <option>Motorista</option>
+                <option>Auxiliar administrativo</option>
+                <option>Técnico de manutenção</option>
+                <option>Vendedor</option>
+                <option value="Outro">Outro (especificar)</option>
+              </select>
+              <input type="text" id="cargoOutro" placeholder="Especifique o cargo" style="display:none; margin-top:6px;">
+            </div>
+            <div class="field">
+              <label for="setor">Setor</label>
+              <select id="setor" onchange="toggleOutro('setor')">
+                <option value="">Selecione...</option>
+                <option>Produção</option>
+                <option>Logística</option>
+                <option>Administrativo</option>
+                <option>Manutenção</option>
+                <option>Comercial</option>
+                <option value="Outro">Outro (especificar)</option>
+              </select>
+              <input type="text" id="setorOutro" placeholder="Especifique o setor" style="display:none; margin-top:6px;">
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="dataExame">Data do exame</label>
+              <input type="date" id="dataExame" required>
+            </div>
+            <div class="field">
+              <label for="tipoExame">Tipo de exame</label>
+              <select id="tipoExame">
+                <option>Admissional</option>
+                <option>Periódico</option>
+                <option>Retorno ao trabalho</option>
+                <option>Mudança de função</option>
+                <option>Demissional</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="section2">
+        <div class="section-head"><span class="section-num">2</span><span class="section-title">Questionário de saúde</span></div>
+        <div class="section-body body-font">
+
+          <div class="question">
+            <p class="q-text">1. Você possui alguma doença crônica diagnosticada (ex.: hipertensão, diabetes, asma)?</p>
+            <div class="q-answers">
+              <label class="pill"><input type="radio" name="q1" value="sim" onclick="toggleDetail('q1d', true)"><span>Sim</span></label>
+              <label class="pill"><input type="radio" name="q1" value="nao" onclick="toggleDetail('q1d', false)"><span>Não</span></label>
+            </div>
+            <div class="q-detail" id="q1d"><input type="text" placeholder="Qual(is)?"></div>
+          </div>
+
+          <div class="question">
+            <p class="q-text">2. Faz uso contínuo de alguma medicação?</p>
+            <div class="q-answers">
+              <label class="pill"><input type="radio" name="q2" value="sim" onclick="toggleDetail('q2d', true)"><span>Sim</span></label>
+              <label class="pill"><input type="radio" name="q2" value="nao" onclick="toggleDetail('q2d', false)"><span>Não</span></label>
+            </div>
+            <div class="q-detail" id="q2d"><input type="text" placeholder="Qual(is)?"></div>
+          </div>
+
+          <div class="question">
+            <p class="q-text">3. Já sofreu algum acidente de trabalho anteriormente?</p>
+            <div class="q-answers">
+              <label class="pill"><input type="radio" name="q3" value="sim" onclick="toggleDetail('q3d', true)"><span>Sim</span></label>
+              <label class="pill"><input type="radio" name="q3" value="nao" onclick="toggleDetail('q3d', false)"><span>Não</span></label>
+            </div>
+            <div class="q-detail" id="q3d"><input type="text" placeholder="Descreva brevemente"></div>
+          </div>
+
+          <div class="question">
+            <p class="q-text">4. Possui alguma limitação física ou sensorial que deva ser considerada na sua função?</p>
+            <div class="q-answers">
+              <label class="pill"><input type="radio" name="q4" value="sim" onclick="toggleDetail('q4d', true)"><span>Sim</span></label>
+              <label class="pill"><input type="radio" name="q4" value="nao" onclick="toggleDetail('q4d', false)"><span>Não</span></label>
+            </div>
+            <div class="q-detail" id="q4d"><input type="text" placeholder="Descreva brevemente"></div>
+          </div>
+
+          <div class="question">
+            <p class="q-text">5. Sente algum desconforto atual (dor, cansaço excessivo, dificuldade auditiva ou visual)?</p>
+            <div class="q-answers">
+              <label class="pill"><input type="radio" name="q5" value="sim" onclick="toggleDetail('q5d', true)"><span>Sim</span></label>
+              <label class="pill"><input type="radio" name="q5" value="nao" onclick="toggleDetail('q5d', false)"><span>Não</span></label>
+            </div>
+            <div class="q-detail" id="q5d"><input type="text" placeholder="Descreva brevemente"></div>
+          </div>
+
+          <div class="field full" style="margin-top:6px;">
+            <label for="obs">Observações adicionais</label>
+            <textarea id="obs" placeholder="Espaço livre para qualquer informação relevante"></textarea>
+          </div>
+
+        </div>
+      </section>
+
+      <section class="section" id="section3">
+        <div class="section-head"><span class="section-num">3</span><span class="section-title">Declaração</span></div>
+        <div class="section-body body-font">
+          <div class="declaration">
+            Declaro que as informações prestadas neste questionário são verdadeiras e correspondem ao meu real
+            estado de saúde no momento do preenchimento. Estou ciente de que omitir ou falsear informações
+            pode comprometer a avaliação ocupacional.
+          </div>
+          <label class="checkline">
+            <input type="checkbox" id="declaraCheck" required>
+            <span>Li e confirmo a declaração acima.</span>
+          </label>
+        </div>
+      </section>
+
+      <section class="section" id="section4">
+        <div class="section-head"><span class="section-num">4</span><span class="section-title">Confirmação de identidade</span></div>
+        <div class="section-body body-font">
+          <p style="font-size:13px; color:var(--ink-soft); margin-top:0;">
+            Em substituição à assinatura manuscrita, confirme sua identidade por foto do rosto ou assinatura na tela.
+          </p>
+
+          <label class="checkline" style="margin-top:0; margin-bottom:16px;">
+            <input type="checkbox" id="consentImagem" onchange="onConsentChange()">
+            <span>Autorizo o uso da minha imagem (foto ou assinatura) exclusivamente para confirmar minha identidade neste questionário.</span>
+          </label>
+
+          <div class="btn-row" style="margin-bottom:14px;">
+            <button type="button" id="btnModeFoto" onclick="setConfirmMode('foto')" disabled>Confirmar por foto</button>
+            <button type="button" id="btnModeAssinatura" onclick="setConfirmMode('assinatura')" disabled>Confirmar por assinatura</button>
+          </div>
+
+          <div class="id-box" id="modoFoto">
+            <div class="cam-frame" id="camFrame">
+              <div class="placeholder" id="camPlaceholder">Marque o consentimento acima e clique em "Ativar câmera".</div>
+              <video id="video" autoplay playsinline style="display:none;"></video>
+              <canvas id="canvas" style="display:none;"></canvas>
+              <img id="snapshot" style="display:none;" alt="Foto de confirmação capturada">
+              <div class="corner tl"></div><div class="corner tr"></div>
+              <div class="corner bl"></div><div class="corner br"></div>
+            </div>
+            <div class="id-controls">
+              <div class="id-status" id="camStatus">Nenhuma foto capturada ainda.</div>
+              <div class="btn-row">
+                <button type="button" id="btnStart" onclick="startCamera()" disabled>Ativar câmera</button>
+                <button type="button" id="btnCapture" onclick="capturePhoto()" disabled>Capturar foto</button>
+                <button type="button" id="btnRetake" onclick="retakePhoto()" style="display:none;">Repetir foto</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="id-box" id="modoAssinatura" style="display:none;">
+            <div class="cam-frame pad">
+              <canvas id="sigCanvas" width="200" height="200" style="touch-action:none; cursor:crosshair;"></canvas>
+            </div>
+            <div class="id-controls">
+              <div class="id-status" id="sigStatus">Desenhe sua assinatura no quadro ao lado.</div>
+              <div class="btn-row">
+                <button type="button" id="btnClearSig" onclick="clearSignature()">Limpar assinatura</button>
+                <button type="button" id="btnUseSig" onclick="useSignature()">Usar esta assinatura</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="stamp" id="stampConfirm">
+            <div class="stamp-seal">✓</div>
+            <div class="stamp-text"><b>Identidade confirmada</b><span id="stampTime">—</span></div>
+          </div>
+
+          <div class="field full" style="margin-top:18px;">
+            <label for="anexoPdf">Anexar ASO oficial assinado pelo médico (PDF, opcional)</label>
+            <input type="file" id="anexoPdf" accept="application/pdf" onchange="onAnexoChange()">
+            <span class="field-hint" id="anexoHint"></span>
+          </div>
+        </div>
+      </section>
+
+      <div class="disclaimer">
+        <strong>Nota sobre este modelo:</strong> este é um documento fictício, criado apenas como demonstração
+        de layout e fluxo. Antes de usar em produção, o consultório deve validar com um responsável jurídico
+        se a captura fotográfica/assinatura atende às exigências legais de identificação para o ASO
+        (incluindo LGPD, no que diz respeito a dados biométricos, de imagem e de saúde), o acesso à consulta
+        e o prazo de retenção dos registros.
+      </div>
+
+      <footer class="actions">
+        <button type="button" onclick="clearForm()">Limpar</button>
+        <button type="submit" class="primary" id="btnSubmit">Concluir e salvar</button>
+      </footer>
+
+    </form>
+
+    <div class="confirmed-panel" id="confirmedPanel">
+      <h3>Questionário salvo no banco de exames</h3>
+      <p>Este registro já pode ser encontrado na aba "Consultar exames".</p>
+      <div class="row"><span>Funcionário</span><span id="sumNome">—</span></div>
+      <div class="row"><span>Tipo de exame</span><span id="sumTipo">—</span></div>
+      <div class="row"><span>Identidade confirmada em</span><span id="sumHora">—</span></div>
+    </div>
+  </div>
+
+  <!-- ===================== VIEW: QUERY / DATABASE ===================== -->
+  <div class="view" id="viewQuery">
+
+    <div class="pin-gate" id="pinGateQuery">
+      <div class="lock">🔒</div>
+      <h4>Acesso restrito</h4>
+      <p>Digite o código de acesso do responsável para consultar os exames salvos.</p>
+      <div class="pin-error" id="pinErrorQuery">Código incorreto. Tente novamente.</div>
+      <input type="password" id="pinInputQuery" placeholder="Código" maxlength="6">
+      <div><button type="button" class="primary" onclick="checkPin('query')">Entrar</button></div>
+      <p style="margin-top:16px; font-size:11px;">Modelo fictício — código de demonstração: <b>1234</b></p>
+    </div>
+
+    <div id="queryContent" style="display:none;">
+      <section class="section">
+        <div class="section-head"><span class="section-num">🔎</span><span class="section-title">Consultar exames salvos</span></div>
+        <div class="section-body body-font">
+          <div class="query-bar">
+            <div class="field">
+              <label for="filtroAno">Ano do exame</label>
+              <select id="filtroAno" onchange="applyFilters()"><option value="">Todos os anos</option></select>
+            </div>
+            <div class="field" style="flex:1;">
+              <label for="filtroNome">Nome do funcionário</label>
+              <input type="text" id="filtroNome" placeholder="Buscar por nome..." oninput="applyFilters()">
+            </div>
+            <div class="field">
+              <label for="filtroCpf">CPF / matrícula</label>
+              <input type="text" id="filtroCpf" placeholder="Buscar..." oninput="applyFilters()">
+            </div>
+            <div class="field">
+              <label for="filtroEmpresa">Empresa cliente</label>
+              <input type="text" id="filtroEmpresa" placeholder="Buscar..." oninput="applyFilters()">
+            </div>
+            <div class="field">
+              <label for="filtroTipo">Tipo de exame</label>
+              <select id="filtroTipo" onchange="applyFilters()">
+                <option value="">Todos os tipos</option>
+                <option>Admissional</option>
+                <option>Periódico</option>
+                <option>Retorno ao trabalho</option>
+                <option>Mudança de função</option>
+                <option>Demissional</option>
+              </select>
+            </div>
+            <button type="button" onclick="loadRecords()">Atualizar lista</button>
+          </div>
+
+          <div class="volume-warning" id="volumeWarning"></div>
+
+          <div class="toolbar-row">
+            <label class="check-inline"><input type="checkbox" id="mostrarAnulados" onchange="applyFilters()"> Mostrar registros anulados</label>
+            <div class="btn-row">
+              <button type="button" onclick="exportCSV()">Exportar CSV</button>
+              <button type="button" onclick="exportPDF()">Exportar PDF</button>
+            </div>
+          </div>
+
+          <div id="queryLoading" class="loading">Carregando registros...</div>
+          <div id="queryTableWrap" style="display:none;">
+            <table class="results">
+              <thead><tr><th></th><th>Funcionário</th><th>Tipo de exame</th><th>Data</th><th>Validade</th><th></th></tr></thead>
+              <tbody id="resultsBody"></tbody>
+            </table>
+            <div class="toolbar-row">
+              <div class="count-badge" id="countBadge"></div>
+              <div class="pagination" id="pagination"></div>
+            </div>
+          </div>
+          <div id="emptyState" class="empty-state" style="display:none;">
+            Nenhum exame salvo ainda. Preencha um questionário na aba "Novo questionário" para começar.
+          </div>
+        </div>
+      </section>
+
+      <div class="retention-box">
+        <h4>Política de retenção</h4>
+        <p>Remove permanentemente exames mais antigos que o prazo definido (exclusão real do banco, não recuperável).</p>
+        <div class="retention-row">
+          <span class="body-font" style="font-size:12.5px;">Manter registros dos últimos</span>
+          <input type="number" id="retencaoAnos" value="5" min="1" max="20">
+          <span class="body-font" style="font-size:12.5px;">anos</span>
+          <button type="button" class="danger" onclick="applyRetention()">Aplicar política agora</button>
+        </div>
+      </div>
+
+      <div class="audit-box">
+        <h4>Log de acessos e ações</h4>
+        <p>Registro de quando a consulta foi acessada e de anulações de exames, para fins de auditoria.</p>
+        <button type="button" onclick="loadAuditLog()">Carregar log</button>
+        <ul class="audit-list" id="auditList"></ul>
+      </div>
+
+      <div class="query-note" style="margin:22px 20px 0;">
+        Os registros salvos aqui ficam visíveis para qualquer pessoa que tenha o código de acesso — é um banco
+        de dados compartilhado do consultório, não uma cópia individual por dispositivo. O código acima é
+        apenas uma barreira de demonstração; para uso real, isso deve virar autenticação de verdade, com
+        identificação de qual usuário acessou (hoje o log não sabe "quem", só "quando").
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== VIEW: DASHBOARD ===================== -->
+  <div class="view" id="viewDash">
+
+    <div class="pin-gate" id="pinGateDash">
+      <div class="lock">🔒</div>
+      <h4>Acesso restrito</h4>
+      <p>Digite o código de acesso para ver o painel.</p>
+      <div class="pin-error" id="pinErrorDash">Código incorreto. Tente novamente.</div>
+      <input type="password" id="pinInputDash" placeholder="Código" maxlength="6">
+      <div><button type="button" class="primary" onclick="checkPin('dash')">Entrar</button></div>
+      <p style="margin-top:16px; font-size:11px;">Modelo fictício — código de demonstração: <b>1234</b></p>
+    </div>
+
+    <div id="dashContent" style="display:none;">
+      <div class="cards-row">
+        <div class="stat-card"><div class="num" id="dashTotal">0</div><div class="lbl">Exames ativos no total</div></div>
+        <div class="stat-card"><div class="num" id="dashMes">0</div><div class="lbl">Salvos neste mês</div></div>
+        <div class="stat-card warncard"><div class="num" id="dashVencidos">0</div><div class="lbl">Exames vencidos (+365 dias)</div></div>
+      </div>
+
+      <section class="section">
+        <div class="section-head"><span class="section-num">▤</span><span class="section-title">Exames por tipo</span></div>
+        <div class="section-body body-font" id="dashPorTipo"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><span class="section-num">▤</span><span class="section-title">Exames por empresa cliente</span></div>
+        <div class="section-body body-font" id="dashPorEmpresa"></div>
+      </section>
+    </div>
+  </div>
+
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOnOverlay(event)">
+  <div class="modal">
+    <div class="modal-head"><h4>Detalhes do exame</h4><button onclick="closeModal()">✕</button></div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div id="printArea"></div>
+
+<script>
+  // ---------- Tabs ----------
+  function switchTab(tab){
+    document.getElementById('viewForm').classList.toggle('active', tab==='form');
+    document.getElementById('viewQuery').classList.toggle('active', tab==='query');
+    document.getElementById('viewDash').classList.toggle('active', tab==='dash');
+    document.getElementById('tabBtnForm').classList.toggle('active', tab==='form');
+    document.getElementById('tabBtnQuery').classList.toggle('active', tab==='query');
+    document.getElementById('tabBtnDash').classList.toggle('active', tab==='dash');
+    if(tab === 'query' && queryUnlocked){ loadRecords(); }
+    if(tab === 'dash' && dashUnlocked){ loadRecords().then(renderDashboard); }
+  }
+
+  function toggleDetail(id, show){
+    const el = document.getElementById(id);
+    if(show){ el.classList.add('show'); } else { el.classList.remove('show'); el.querySelector('input').value=''; }
+  }
+
+  function toggleOutro(field){
+    const select = document.getElementById(field);
+    const outro = document.getElementById(field+'Outro');
+    outro.style.display = select.value === 'Outro' ? 'block' : 'none';
+  }
+
+  function getFieldValue(field){
+    const select = document.getElementById(field);
+    if(select.value === 'Outro'){
+      return document.getElementById(field+'Outro').value || '';
+    }
+    return select.value;
+  }
+
+  // ---------- CPF validation ----------
+  function validarCPF(cpf){
+    cpf = cpf.replace(/\D/g, '');
+    if(cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+    let soma = 0;
+    for(let i=0;i<9;i++) soma += parseInt(cpf[i]) * (10-i);
+    let resto = (soma*10) % 11; if(resto===10||resto===11) resto=0;
+    if(resto !== parseInt(cpf[9])) return false;
+    soma = 0;
+    for(let i=0;i<10;i++) soma += parseInt(cpf[i]) * (11-i);
+    resto = (soma*10) % 11; if(resto===10||resto===11) resto=0;
+    return resto === parseInt(cpf[10]);
+  }
+
+  function onCpfInput(){
+    const val = document.getElementById('cpf').value;
+    const digitsOnly = val.replace(/\D/g,'');
+    const hint = document.getElementById('cpfHint');
+    if(digitsOnly.length === 0){ hint.textContent=''; return; }
+    if(/[a-zA-Z]/.test(val)){
+      hint.textContent = 'Tratado como matrícula (contém letras).';
+      hint.className = 'field-hint';
+      return;
+    }
+    if(digitsOnly.length === 11){
+      if(validarCPF(val)){ hint.textContent = 'CPF válido.'; hint.className = 'field-hint ok'; }
+      else{ hint.textContent = 'CPF com dígitos verificadores inválidos — confira.'; hint.className = 'field-hint err'; }
+    }else{
+      hint.textContent = '';
+    }
+  }
+
+  // ---------- Stepper ----------
+  const stepItems = document.querySelectorAll('.step-item');
+  const stepObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        const stepNum = entry.target.id.replace('section','');
+        stepItems.forEach(item => item.classList.toggle('active', item.dataset.step === stepNum));
+      }
+    });
+  }, { rootMargin: '-40% 0px -50% 0px' });
+  ['section1','section2','section3','section4'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) stepObserver.observe(el);
+  });
+
+  // ---------- Consent + modo de confirmação ----------
+  let confirmMode = null;
+
+  function onConsentChange(){
+    const consented = document.getElementById('consentImagem').checked;
+    document.getElementById('btnModeFoto').disabled = !consented;
+    document.getElementById('btnModeAssinatura').disabled = !consented;
+    if(!consented) document.getElementById('btnStart').disabled = true;
+  }
+
+  function setConfirmMode(mode){
+    confirmMode = mode;
+    document.getElementById('modoFoto').style.display = mode === 'foto' ? 'flex' : 'none';
+    document.getElementById('modoAssinatura').style.display = mode === 'assinatura' ? 'flex' : 'none';
+    document.getElementById('btnStart').disabled = mode !== 'foto';
+    if(mode === 'assinatura'){ initSignaturePad(); }
+  }
+
+  // ---------- Camera ----------
+  let stream = null;
+  let photoTaken = false;
+  let lastPhotoDataUrl = null;
+
+  async function startCamera(){
+    const video = document.getElementById('video');
+    const placeholder = document.getElementById('camPlaceholder');
+    const status = document.getElementById('camStatus');
+    try{
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio:false });
+      video.srcObject = stream;
+      video.style.display = 'block';
+      placeholder.style.display = 'none';
+      document.getElementById('btnCapture').disabled = false;
+      document.getElementById('btnStart').disabled = true;
+      status.textContent = 'Câmera ativa. Posicione o rosto no quadro e capture a foto.';
+    }catch(err){
+      status.textContent = 'Não foi possível acessar a câmera. Tente a opção "Confirmar por assinatura".';
+    }
+  }
+
+  function capturePhoto(){
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const snapshot = document.getElementById('snapshot');
+    const status = document.getElementById('camStatus');
+
+    canvas.width = 200; canvas.height = 200;
+    const ctx = canvas.getContext('2d');
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1,1);
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    lastPhotoDataUrl = canvas.toDataURL('image/jpeg', 0.55);
+    snapshot.src = lastPhotoDataUrl;
+    snapshot.style.display = 'block';
+    video.style.display = 'none';
+    if(stream){ stream.getTracks().forEach(t => t.stop()); }
+
+    document.getElementById('btnCapture').style.display = 'none';
+    document.getElementById('btnRetake').style.display = 'inline-block';
+    document.getElementById('btnStart').style.display = 'none';
+
+    markConfirmed();
+    status.textContent = 'Foto capturada com sucesso (imagem compactada para ocupar menos espaço).';
+  }
+
+  function retakePhoto(){
+    photoTaken = false;
+    lastPhotoDataUrl = null;
+    document.getElementById('snapshot').style.display = 'none';
+    document.getElementById('stampConfirm').classList.remove('show');
+    document.getElementById('btnRetake').style.display = 'none';
+    document.getElementById('btnCapture').style.display = 'inline-block';
+    document.getElementById('btnStart').style.display = 'inline-block';
+    document.getElementById('btnStart').disabled = false;
+    document.getElementById('btnCapture').disabled = true;
+    document.getElementById('camPlaceholder').style.display = 'flex';
+    document.getElementById('camStatus').textContent = 'Nenhuma foto capturada ainda.';
+  }
+
+  // ---------- Signature pad ----------
+  let sigCtx = null, sigDrawing = false, sigHasStrokes = false;
+
+  function initSignaturePad(){
+    const canvas = document.getElementById('sigCanvas');
+    if(sigCtx) return;
+    sigCtx = canvas.getContext('2d');
+    sigCtx.strokeStyle = '#0f2b2e'; sigCtx.lineWidth = 2.4; sigCtx.lineCap = 'round';
+    const getPos = (e) => { const rect = canvas.getBoundingClientRect(); const p = e.touches ? e.touches[0] : e; return { x:p.clientX-rect.left, y:p.clientY-rect.top }; };
+    const start = (e) => { e.preventDefault(); sigDrawing = true; const p = getPos(e); sigCtx.beginPath(); sigCtx.moveTo(p.x,p.y); };
+    const move = (e) => { if(!sigDrawing) return; e.preventDefault(); const p = getPos(e); sigCtx.lineTo(p.x,p.y); sigCtx.stroke(); sigHasStrokes = true; };
+    const end = () => { sigDrawing = false; };
+    canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', move); window.addEventListener('mouseup', end);
+    canvas.addEventListener('touchstart', start, {passive:false}); canvas.addEventListener('touchmove', move, {passive:false}); canvas.addEventListener('touchend', end);
+  }
+
+  function clearSignature(){
+    const canvas = document.getElementById('sigCanvas');
+    if(sigCtx) sigCtx.clearRect(0,0,canvas.width, canvas.height);
+    sigHasStrokes = false;
+    document.getElementById('sigStatus').textContent = 'Desenhe sua assinatura no quadro ao lado.';
+  }
+
+  function useSignature(){
+    if(!sigHasStrokes){ document.getElementById('sigStatus').textContent = 'Desenhe a assinatura antes de confirmar.'; return; }
+    const canvas = document.getElementById('sigCanvas');
+    lastPhotoDataUrl = canvas.toDataURL('image/png');
+    document.getElementById('sigStatus').textContent = 'Assinatura registrada com sucesso.';
+    markConfirmed();
+  }
+
+  function markConfirmed(){
+    photoTaken = true;
+    const now = new Date();
+    document.getElementById('stampTime').textContent = now.toLocaleDateString('pt-BR') + ' às ' + now.toLocaleTimeString('pt-BR');
+    document.getElementById('stampConfirm').classList.add('show');
+  }
+
+  // ---------- Anexo PDF ----------
+  let anexoNome = null, anexoData = null;
+  function onAnexoChange(){
+    const input = document.getElementById('anexoPdf');
+    const hint = document.getElementById('anexoHint');
+    const file = input.files[0];
+    if(!file){ anexoNome=null; anexoData=null; hint.textContent=''; return; }
+    if(file.size > 3.5 * 1024 * 1024){
+      hint.textContent = 'Arquivo muito grande (máx. recomendado ~3,5MB). Escolha outro arquivo.';
+      hint.className = 'field-hint err';
+      input.value = ''; anexoNome=null; anexoData=null;
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => { anexoNome = file.name; anexoData = reader.result; hint.textContent = 'Anexado: ' + file.name; hint.className = 'field-hint ok'; };
+    reader.onerror = () => { hint.textContent = 'Não foi possível ler o arquivo.'; hint.className = 'field-hint err'; };
+    reader.readAsDataURL(file);
+  }
+
+  function clearForm(){
+    document.getElementById('asoForm').reset();
+    retakePhoto(); clearSignature();
+    confirmMode = null; photoTaken = false; lastPhotoDataUrl = null;
+    anexoNome = null; anexoData = null;
+    document.getElementById('anexoHint').textContent = '';
+    document.getElementById('modoFoto').style.display = 'flex';
+    document.getElementById('modoAssinatura').style.display = 'none';
+    document.getElementById('btnModeFoto').disabled = true;
+    document.getElementById('btnModeAssinatura').disabled = true;
+    document.getElementById('stampConfirm').classList.remove('show');
+    document.getElementById('cargoOutro').style.display = 'none';
+    document.getElementById('setorOutro').style.display = 'none';
+    document.getElementById('cpfHint').textContent = '';
+    document.querySelectorAll('.q-detail').forEach(el => el.classList.remove('show'));
+    document.getElementById('confirmedPanel').classList.remove('show');
+  }
+
+  function collectAnswers(){
+    const map = { q1:'Doença crônica diagnosticada', q2:'Uso contínuo de medicação', q3:'Acidente de trabalho anterior', q4:'Limitação física ou sensorial', q5:'Desconforto atual' };
+    const answers = [];
+    Object.keys(map).forEach(key => {
+      const checked = document.querySelector('input[name="'+key+'"]:checked');
+      if(checked){
+        const detailEl = document.getElementById(key+'d');
+        const detailInput = detailEl ? detailEl.querySelector('input') : null;
+        answers.push({ pergunta: map[key], resposta: checked.value === 'sim' ? 'Sim' : 'Não', detalhe: (checked.value === 'sim' && detailInput) ? detailInput.value : '' });
+      }
+    });
+    return answers;
+  }
+
+  // ---------- Save to database (with duplicate check) ----------
+  document.getElementById('asoForm').addEventListener('submit', async function(e){
+    e.preventDefault();
+    if(!document.getElementById('consentImagem').checked){ alert('É necessário marcar o consentimento de uso de imagem.'); return; }
+    if(!photoTaken){ alert('Capture a foto ou registre a assinatura de confirmação de identidade antes de concluir.'); return; }
+    if(!document.getElementById('declaraCheck').checked){ alert('É necessário confirmar a declaração antes de concluir.'); return; }
+
+    const submitBtn = document.getElementById('btnSubmit');
+    submitBtn.disabled = true; submitBtn.textContent = 'Verificando...';
+
+    const nomeVal = document.getElementById('nome').value || '—';
+    const cpfVal = document.getElementById('cpf').value || '';
+    const dataExameVal = document.getElementById('dataExame').value;
+
+    // Verificação de duplicidade
+    try{
+      const listResult = await window.storage.list('exame_', true);
+      const keys = (listResult && listResult.keys) ? listResult.keys : [];
+      let duplicado = false;
+      for(const key of keys){
+        const r = await window.storage.get(key, true);
+        if(!r || !r.value) continue;
+        const existing = JSON.parse(r.value);
+        if(existing.anulado) continue;
+        const mesmoCpf = cpfVal && existing.cpf && existing.cpf.trim() === cpfVal.trim();
+        const mesmoNome = !cpfVal && existing.nome && existing.nome.trim().toLowerCase() === nomeVal.trim().toLowerCase();
+        if((mesmoCpf || mesmoNome) && existing.dataExame === dataExameVal){
+          duplicado = true; break;
+        }
+      }
+      if(duplicado){
+        const seguir = confirm('Já existe um exame salvo para esse funcionário nesta mesma data. Deseja salvar mesmo assim?');
+        if(!seguir){ submitBtn.disabled = false; submitBtn.textContent = 'Concluir e salvar'; return; }
+      }
+    }catch(err){ /* se a verificação falhar, segue com o salvamento normalmente */ }
+
+    submitBtn.textContent = 'Salvando...';
+
+    const record = {
+      id: 'exame_' + Date.now() + '_' + Math.random().toString(36).slice(2,8),
+      nome: nomeVal,
+      cpf: cpfVal,
+      empresaCliente: document.getElementById('empresaCliente').value || '',
+      cargo: getFieldValue('cargo'),
+      setor: getFieldValue('setor'),
+      dataExame: dataExameVal,
+      ano: dataExameVal ? dataExameVal.slice(0,4) : String(new Date().getFullYear()),
+      tipoExame: document.getElementById('tipoExame').value,
+      obs: document.getElementById('obs').value || '',
+      respostas: collectAnswers(),
+      tipoConfirmacao: confirmMode || 'foto',
+      foto: lastPhotoDataUrl,
+      anexoNome: anexoNome,
+      anexoData: anexoData,
+      confirmadoEm: document.getElementById('stampTime').textContent,
+      salvoEm: new Date().toISOString(),
+      anulado: false,
+      anuladoEm: null,
+      historico: []
+    };
+
+    try{
+      const result = await window.storage.set(record.id, JSON.stringify(record), true);
+      if(!result){ alert('Não foi possível salvar o registro. Tente novamente.'); submitBtn.disabled=false; submitBtn.textContent='Concluir e salvar'; return; }
+    }catch(err){ alert('Erro ao salvar o registro no banco de exames.'); submitBtn.disabled=false; submitBtn.textContent='Concluir e salvar'; return; }
+
+    submitBtn.disabled = false; submitBtn.textContent = 'Concluir e salvar';
+    document.getElementById('sumNome').textContent = record.nome;
+    document.getElementById('sumTipo').textContent = record.tipoExame;
+    document.getElementById('sumHora').textContent = record.confirmadoEm;
+    document.getElementById('confirmedPanel').classList.add('show');
+    document.getElementById('confirmedPanel').scrollIntoView({behavior:'smooth'});
+  });
+
+  // ---------- PIN gates ----------
+  let queryUnlocked = false, dashUnlocked = false;
+  const ACCESS_PIN = '1234';
+
+  function checkPin(area){
+    const input = document.getElementById('pinInput' + (area==='query'?'Query':'Dash'));
+    const err = document.getElementById('pinError' + (area==='query'?'Query':'Dash'));
+    if(input.value === ACCESS_PIN){
+      err.classList.remove('show');
+      if(area === 'query'){
+        queryUnlocked = true;
+        document.getElementById('pinGateQuery').style.display = 'none';
+        document.getElementById('queryContent').style.display = 'block';
+        logAudit('Acesso à consulta liberado');
+        loadRecords();
+      }else{
+        dashUnlocked = true;
+        document.getElementById('pinGateDash').style.display = 'none';
+        document.getElementById('dashContent').style.display = 'block';
+        logAudit('Acesso ao painel liberado');
+        loadRecords().then(renderDashboard);
+      }
+    }else{
+      err.classList.add('show');
+    }
+  }
+
+  // ---------- Query / database ----------
+  let allRecords = [];
+  let filteredRecords = [];
+  let currentPage = 1;
+  const PAGE_SIZE = 8;
+  const VOLUME_LIMIT = 150;
+
+  async function loadRecords(){
+    const loadingEl = document.getElementById('queryLoading');
+    const wrapEl = document.getElementById('queryTableWrap');
+    const emptyEl = document.getElementById('emptyState');
+    if(loadingEl){ loadingEl.style.display = 'block'; wrapEl.style.display = 'none'; emptyEl.style.display = 'none'; }
+
+    try{
+      const listResult = await window.storage.list('exame_', true);
+      const keys = (listResult && listResult.keys) ? listResult.keys : [];
+
+      if(keys.length === 0){
+        allRecords = [];
+        if(loadingEl){ loadingEl.style.display = 'none'; emptyEl.style.display = 'block'; }
+        return;
+      }
+
+      const records = [];
+      for(const key of keys){
+        try{ const r = await window.storage.get(key, true); if(r && r.value) records.push(JSON.parse(r.value)); }
+        catch(innerErr){ /* ignora registro individual inacessível */ }
+      }
+      records.sort((a,b) => (b.salvoEm || '').localeCompare(a.salvoEm || ''));
+      allRecords = records;
+
+      const volumeWarning = document.getElementById('volumeWarning');
+      if(volumeWarning){
+        if(records.length > VOLUME_LIMIT){
+          volumeWarning.textContent = 'Atenção: ' + records.length + ' exames no banco. Com muitos registros a consulta pode ficar mais lenta — considere aplicar a política de retenção.';
+          volumeWarning.classList.add('show');
+        }else{
+          volumeWarning.classList.remove('show');
+        }
+      }
+
+      populateYearFilter(records);
+      if(loadingEl) loadingEl.style.display = 'none';
+      currentPage = 1;
+      applyFilters();
+    }catch(err){
+      if(loadingEl) loadingEl.textContent = 'Não foi possível carregar os registros agora. Tente atualizar novamente.';
+    }
+  }
+
+  function populateYearFilter(records){
+    const select = document.getElementById('filtroAno');
+    if(!select) return;
+    const currentValue = select.value;
+    const years = Array.from(new Set(records.map(r => r.ano).filter(Boolean))).sort().reverse();
+    select.innerHTML = '<option value="">Todos os anos</option>' + years.map(y => '<option value="'+y+'">'+y+'</option>').join('');
+    select.value = years.includes(currentValue) ? currentValue : '';
+  }
+
+  function examStatus(dataExame){
+    if(!dataExame) return { label:'—', cls:'' };
+    const examDate = new Date(dataExame + 'T00:00:00');
+    const diffDays = Math.floor((Date.now() - examDate.getTime()) / 86400000);
+    if(diffDays > 365) return { label:'Vencido', cls:'err' };
+    if(diffDays > 300) return { label:'Vence em breve', cls:'warn' };
+    return { label:'Em dia', cls:'ok' };
+  }
+
+  function applyFilters(){
+    if(!document.getElementById('filtroAno')) return;
+    const ano = document.getElementById('filtroAno').value;
+    const nomeFiltro = document.getElementById('filtroNome').value.trim().toLowerCase();
+    const cpfFiltro = document.getElementById('filtroCpf').value.trim().toLowerCase();
+    const empresaFiltro = document.getElementById('filtroEmpresa').value.trim().toLowerCase();
+    const tipo = document.getElementById('filtroTipo').value;
+    const mostrarAnulados = document.getElementById('mostrarAnulados').checked;
+
+    filteredRecords = allRecords.filter(r => {
+      if(r.anulado && !mostrarAnulados) return false;
+      const matchAno = !ano || r.ano === ano;
+      const matchNome = !nomeFiltro || (r.nome || '').toLowerCase().includes(nomeFiltro);
+      const matchCpf = !cpfFiltro || (r.cpf || '').toLowerCase().includes(cpfFiltro);
+      const matchEmpresa = !empresaFiltro || (r.empresaCliente || '').toLowerCase().includes(empresaFiltro);
+      const matchTipo = !tipo || r.tipoExame === tipo;
+      return matchAno && matchNome && matchCpf && matchEmpresa && matchTipo;
+    });
+
+    currentPage = 1;
+    renderResults();
+  }
+
+  function renderResults(){
+    const wrapEl = document.getElementById('queryTableWrap');
+    const emptyEl = document.getElementById('emptyState');
+    const body = document.getElementById('resultsBody');
+    const countBadge = document.getElementById('countBadge');
+    const paginationEl = document.getElementById('pagination');
+
+    if(allRecords.length === 0){ wrapEl.style.display='none'; emptyEl.style.display='block'; return; }
+    emptyEl.style.display = 'none'; wrapEl.style.display = 'block';
+
+    if(filteredRecords.length === 0){
+      body.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#4c5651; padding:20px 10px;">Nenhum exame encontrado com esses filtros.</td></tr>';
+      countBadge.textContent = '0 de ' + allRecords.length + ' exames.';
+      paginationEl.innerHTML = '';
+      return;
+    }
+
+    const totalPages = Math.max(1, Math.ceil(filteredRecords.length / PAGE_SIZE));
+    if(currentPage > totalPages) currentPage = totalPages;
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const pageRecords = filteredRecords.slice(start, start + PAGE_SIZE);
+
+    body.innerHTML = pageRecords.map(r => {
+      const dataFmt = r.dataExame ? formatDateBR(r.dataExame) : '—';
+      const thumb = r.foto ? '<img class="thumb" src="'+r.foto+'" alt="Confirmação de '+escapeHtml(r.nome)+'">' : '<div class="thumb" style="background:#efe9dc;"></div>';
+      const status = examStatus(r.dataExame);
+      const badge = '<span class="badge '+status.cls+'">'+status.label+'</span>';
+      return '<tr'+(r.anulado ? ' class="anulado"' : '')+'>' +
+        '<td>'+thumb+'</td>' +
+        '<td>'+escapeHtml(r.nome)+(r.anulado ? ' <span style="font-size:10px;color:#a4443a;">(anulado)</span>' : '')+'</td>' +
+        '<td>'+escapeHtml(r.tipoExame || '—')+'</td>' +
+        '<td>'+dataFmt+'</td>' +
+        '<td>'+badge+'</td>' +
+        '<td><button class="link-btn" onclick="openModal(\''+r.id+'\')">Ver detalhes</button></td>' +
+        '</tr>';
+    }).join('');
+
+    countBadge.textContent = filteredRecords.length + ' de ' + allRecords.length + ' exames encontrados.';
+    paginationEl.innerHTML =
+      '<button type="button" '+(currentPage<=1?'disabled':'')+' onclick="goPage(-1)">← Anterior</button>' +
+      '<span>Página '+currentPage+' de '+totalPages+'</span>' +
+      '<button type="button" '+(currentPage>=totalPages?'disabled':'')+' onclick="goPage(1)">Próxima →</button>';
+  }
+
+  function goPage(delta){ currentPage += delta; renderResults(); }
+
+  function formatDateBR(isoDate){
+    const parts = isoDate.split('-');
+    if(parts.length !== 3) return isoDate;
+    return parts[2] + '/' + parts[1] + '/' + parts[0];
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  function openModal(id){
+    const record = allRecords.find(r => r.id === id);
+    if(!record) return;
+    const body = document.getElementById('modalBody');
+    const status = examStatus(record.dataExame);
+
+    const respostasHtml = (record.respostas || []).map(a =>
+      '<p><b>'+escapeHtml(a.pergunta)+':</b> '+escapeHtml(a.resposta)+(a.detalhe ? ' — '+escapeHtml(a.detalhe) : '')+'</p>'
+    ).join('');
+
+    const historicoHtml = (record.historico && record.historico.length)
+      ? '<div class="modal-history"><b>Histórico</b><ul>' + record.historico.map(h => '<li>'+escapeHtml(h.data)+' — '+escapeHtml(h.acao)+'</li>').join('') + '</ul></div>'
+      : '';
+
+    const anexoHtml = record.anexoData
+      ? '<div class="modal-attach"><a href="'+record.anexoData+'" download="'+escapeHtml(record.anexoNome || 'aso.pdf')+'">📎 Baixar ASO oficial anexado</a></div>'
+      : '';
+
+    body.innerHTML =
+      (record.foto ? '<img class="modal-photo" src="'+record.foto+'" alt="Confirmação de identidade">' : '') +
+      '<div class="modal-row"><span>Funcionário</span><b>'+escapeHtml(record.nome)+'</b></div>' +
+      '<div class="modal-row"><span>CPF / matrícula</span><b>'+escapeHtml(record.cpf || '—')+'</b></div>' +
+      '<div class="modal-row"><span>Empresa cliente</span><b>'+escapeHtml(record.empresaCliente || '—')+'</b></div>' +
+      '<div class="modal-row"><span>Cargo</span><b>'+escapeHtml(record.cargo || '—')+'</b></div>' +
+      '<div class="modal-row"><span>Setor</span><b>'+escapeHtml(record.setor || '—')+'</b></div>' +
+      '<div class="modal-row"><span>Tipo de exame</span><b>'+escapeHtml(record.tipoExame || '—')+'</b></div>' +
+      '<div class="modal-row"><span>Data do exame</span><b>'+(record.dataExame ? formatDateBR(record.dataExame) : '—')+'</b></div>' +
+      '<div class="modal-row"><span>Validade</span><b><span class="badge '+status.cls+'">'+status.label+'</span></b></div>' +
+      '<div class="modal-row"><span>Confirmação por</span><b>'+(record.tipoConfirmacao === 'assinatura' ? 'Assinatura na tela' : 'Foto do rosto')+'</b></div>' +
+      '<div class="modal-row"><span>Confirmado em</span><b>'+escapeHtml(record.confirmadoEm || '—')+'</b></div>' +
+      anexoHtml +
+      '<div class="modal-answers">'+respostasHtml+'</div>' +
+      (record.obs ? '<p style="margin-top:10px;font-size:12.5px;"><b>Observações:</b> '+escapeHtml(record.obs)+'</p>' : '') +
+      historicoHtml +
+      '<div class="modal-actions">' + (record.anulado ? '' : '<button type="button" class="danger" onclick="anularRegistro(\''+record.id+'\')">Anular registro</button>') + '</div>';
+
+    document.getElementById('modalOverlay').classList.add('show');
+  }
+
+  async function anularRegistro(id){
+    if(!confirm('Tem certeza que deseja anular este registro? Ele deixará de contar como exame válido, mas ficará no histórico para auditoria.')) return;
+    const record = allRecords.find(r => r.id === id);
+    if(!record) return;
+    record.anulado = true;
+    record.anuladoEm = new Date().toISOString();
+    if(!record.historico) record.historico = [];
+    record.historico.push({ data: new Date().toLocaleString('pt-BR'), acao: 'Registro anulado' });
+    try{ await window.storage.set(record.id, JSON.stringify(record), true); }
+    catch(err){ alert('Não foi possível anular o registro agora.'); return; }
+    logAudit('Registro anulado: ' + record.nome);
+    closeModal();
+    applyFilters();
+  }
+
+  function closeModal(){ document.getElementById('modalOverlay').classList.remove('show'); }
+  function closeModalOnOverlay(e){ if(e.target.id === 'modalOverlay') closeModal(); }
+
+  // ---------- Retention policy ----------
+  async function applyRetention(){
+    const anos = parseInt(document.getElementById('retencaoAnos').value, 10) || 5;
+    const cutoffYear = new Date().getFullYear() - anos;
+    const toDelete = allRecords.filter(r => parseInt(r.ano,10) < cutoffYear);
+    if(toDelete.length === 0){ alert('Nenhum registro é mais antigo que ' + anos + ' anos.'); return; }
+    if(!confirm('Isso vai apagar permanentemente ' + toDelete.length + ' registro(s) anterior(es) a ' + cutoffYear + '. Confirmar?')) return;
+    for(const r of toDelete){
+      try{ const current = await window.storage.get(r.id, true); if(current) await window.storage.delete(r.id, true); }
+      catch(err){ /* segue tentando os demais */ }
+    }
+    logAudit('Política de retenção aplicada (' + toDelete.length + ' registro(s) removido(s))');
+    loadRecords();
+  }
+
+  // ---------- Audit log ----------
+  async function logAudit(acao){
+    try{
+      const key = 'audit_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+      await window.storage.set(key, JSON.stringify({ data: new Date().toLocaleString('pt-BR'), acao: acao }), true);
+    }catch(err){ /* log é best-effort, não bloqueia o fluxo principal */ }
+  }
+
+  async function loadAuditLog(){
+    const list = document.getElementById('auditList');
+    list.innerHTML = '<li>Carregando...</li>';
+    try{
+      const listResult = await window.storage.list('audit_', true);
+      const keys = (listResult && listResult.keys) ? listResult.keys : [];
+      const entries = [];
+      for(const key of keys.slice(-50)){
+        try{ const r = await window.storage.get(key, true); if(r && r.value) entries.push(JSON.parse(r.value)); }
+        catch(e){ /* ignora */ }
+      }
+      entries.reverse();
+      if(entries.length === 0){ list.innerHTML = '<li>Nenhuma ação registrada ainda.</li>'; return; }
+      list.innerHTML = entries.slice(0,20).map(e => '<li><span>'+escapeHtml(e.acao)+'</span><span>'+escapeHtml(e.data)+'</span></li>').join('');
+    }catch(err){
+      list.innerHTML = '<li>Não foi possível carregar o log agora.</li>';
+    }
+  }
+
+  // ---------- Export CSV ----------
+  function exportCSV(){
+    if(filteredRecords.length === 0){ alert('Não há registros para exportar com os filtros atuais.'); return; }
+    const header = ['Nome','CPF/Matrícula','Empresa cliente','Cargo','Setor','Tipo de exame','Data do exame','Validade','Confirmado em','Status'];
+    const rows = filteredRecords.map(r => {
+      const status = examStatus(r.dataExame);
+      return [ r.nome, r.cpf, r.empresaCliente, r.cargo, r.setor, r.tipoExame,
+        r.dataExame ? formatDateBR(r.dataExame) : '', status.label, r.confirmadoEm, r.anulado ? 'Anulado' : 'Ativo'
+      ].map(v => '"' + String(v || '').replace(/"/g,'""') + '"').join(',');
+    });
+    const csv = header.join(',') + '\n' + rows.join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type:'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'exames_aso.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  // ---------- Export PDF ----------
+  function exportPDF(){
+    if(filteredRecords.length === 0){ alert('Não há registros para exportar com os filtros atuais.'); return; }
+    const printArea = document.getElementById('printArea');
+    const rowsHtml = filteredRecords.map(r => {
+      const status = examStatus(r.dataExame);
+      return '<tr>' +
+        '<td>'+escapeHtml(r.nome)+'</td><td>'+escapeHtml(r.cpf || '—')+'</td><td>'+escapeHtml(r.empresaCliente || '—')+'</td>' +
+        '<td>'+escapeHtml(r.tipoExame || '—')+'</td><td>'+(r.dataExame ? formatDateBR(r.dataExame) : '—')+'</td>' +
+        '<td>'+status.label+'</td><td>'+(r.anulado ? 'Anulado' : 'Ativo')+'</td></tr>';
+    }).join('');
+    printArea.innerHTML =
+      '<h2 style="font-family:Arial,sans-serif;">Relatório de exames — ASO</h2>' +
+      '<p style="font-family:Arial,sans-serif;font-size:12px;">Gerado em '+new Date().toLocaleString('pt-BR')+' · '+filteredRecords.length+' registro(s)</p>' +
+      '<table style="width:100%;border-collapse:collapse;font-family:Arial,sans-serif;font-size:12px;">' +
+      '<thead><tr style="text-align:left;border-bottom:1px solid #333;"><th style="padding:6px;">Nome</th><th style="padding:6px;">CPF/Matrícula</th><th style="padding:6px;">Empresa</th><th style="padding:6px;">Tipo</th><th style="padding:6px;">Data</th><th style="padding:6px;">Validade</th><th style="padding:6px;">Status</th></tr></thead>' +
+      '<tbody>' + rowsHtml + '</tbody></table>';
+    window.print();
+  }
+
+  // ---------- Dashboard ----------
+  function renderDashboard(){
+    const ativos = allRecords.filter(r => !r.anulado);
+    const now = new Date();
+    const mesAtual = now.getMonth(), anoAtual = now.getFullYear();
+
+    document.getElementById('dashTotal').textContent = ativos.length;
+
+    const esteMes = ativos.filter(r => {
+      if(!r.salvoEm) return false;
+      const d = new Date(r.salvoEm);
+      return d.getMonth() === mesAtual && d.getFullYear() === anoAtual;
+    }).length;
+    document.getElementById('dashMes').textContent = esteMes;
+
+    const vencidos = ativos.filter(r => examStatus(r.dataExame).cls === 'err').length;
+    document.getElementById('dashVencidos').textContent = vencidos;
+
+    renderBarGroup('dashPorTipo', groupBy(ativos, r => r.tipoExame || 'Não informado'));
+    renderBarGroup('dashPorEmpresa', groupBy(ativos, r => r.empresaCliente || 'Não informado'));
+  }
+
+  function groupBy(records, keyFn){
+    const map = {};
+    records.forEach(r => { const k = keyFn(r); map[k] = (map[k] || 0) + 1; });
+    return Object.entries(map).sort((a,b) => b[1]-a[1]);
+  }
+
+  function renderBarGroup(containerId, entries){
+    const container = document.getElementById(containerId);
+    if(entries.length === 0){ container.innerHTML = '<p style="font-size:12.5px;color:var(--ink-soft);">Sem dados ainda.</p>'; return; }
+    const max = Math.max(...entries.map(e => e[1]));
+    container.innerHTML = entries.map(([label,count]) => {
+      const pct = Math.max(6, Math.round((count/max)*100));
+      return '<div class="bar-row"><div class="bar-label">'+escapeHtml(label)+'</div><div class="bar-track"><div class="bar-fill" style="width:'+pct+'%;"></div></div><div class="bar-count">'+count+'</div></div>';
+    }).join('');
+  }
+</script>
+</body>
+</html>
